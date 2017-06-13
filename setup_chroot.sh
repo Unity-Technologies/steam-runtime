@@ -3,11 +3,14 @@
 SCRIPT=$(readlink -f "$0")
 SCRIPTNAME=$(basename "$SCRIPT")
 LOGFILE=/tmp/${SCRIPTNAME%.*}-$(uname -i).log
-CHROOT_PREFIX="steamrt_scout_"
-CHROOT_DIR="/var/chroots"
+CHROOT_PREFIX="LinuxBuildEnvironment"
+CHROOT_DIR=${HOME}/chroots
+CHROOT_VERSION="20170609"
+CHROOT_NAME=""
 BETA_ARG=""
 COLOR_OFF="\033[0m"
 COLOR_ON="\033[1;93m"
+ARCHIVE_PATH=""
 
 # exit on any script line that fails
 set -o errexit
@@ -57,35 +60,32 @@ prebuild_chroot()
 
 build_chroot()
 {
-	case "$1" in
-		"--i386" )
-			pkg="i386"
-			personality="linux32"
-			;;
-		"--amd64" )
-			pkg="amd64"
-			personality="linux"
-			;;
-		* )
-			echo "Error: Unrecognized argument: $1"
-			exit 1
-			;;
-	esac
+	pkg="amd64"
+	personality="linux"
 
-	CHROOT_NAME=${CHROOT_PREFIX}${pkg}
+	CHROOT_NAME="${CHROOT_PREFIX}-${CHROOT_VERSION}"
 
 	# blow away existing directories and recreate empty ones
 	echo -e "\n${COLOR_ON}Creating ${CHROOT_DIR}/${CHROOT_NAME}..."  
 	sudo rm -rf "${CHROOT_DIR}/${CHROOT_NAME}"
-	sudo mkdir -p "${CHROOT_DIR}/${CHROOT_NAME}"
+	rm -rf "${CHROOT_DIR}/linux-sdk-${CHROOT_VERSION}"
+	mkdir -p "${CHROOT_DIR}/${CHROOT_NAME}"
 
 	# Create our schroot .conf file
 	echo -e "\n${COLOR_ON}Creating /etc/schroot/chroot.d/${CHROOT_NAME}.conf...${COLOR_OFF}" 
-	printf "[${CHROOT_NAME}]\ndescription=Ubuntu 12.04 Precise for ${pkg}\ndirectory=${CHROOT_DIR}/${CHROOT_NAME}\npersonality=${personality}\ngroups=sudo\nroot-groups=sudo\npreserve-environment=true\ntype=directory\n" | sudo tee /etc/schroot/chroot.d/${CHROOT_NAME}.conf
+	printf "[${CHROOT_NAME}]\ndescription=Unity Linux SDK ${CHROOT_VERSION}\ndirectory=${CHROOT_DIR}/${CHROOT_NAME}\npersonality=${personality}\ngroups=sudo\nroot-groups=sudo\npreserve-environment=true\ntype=directory\nprofile=linux-sdk-${CHROOT_VERSION}\nscript-config=linux-sdk-${CHROOT_VERSION}/config\n" | sudo tee /etc/schroot/chroot.d/${CHROOT_NAME}.conf
+	cp /etc/schroot/chroot.d/${CHROOT_NAME}.conf ${CHROOT_DIR}
 
-	# Create our chroot
-	echo -e "\n${COLOR_ON}Bootstrap the chroot...${COLOR_OFF}" 
-	sudo -E debootstrap --arch=${pkg} --include=wget precise ${CHROOT_DIR}/${CHROOT_NAME} http://archive.ubuntu.com/ubuntu/
+	printf "FSTAB=\"/etc/schroot/linux-sdk-${CHROOT_VERSION}/fstab\"\nCOPYFILES=\"/etc/schroot/linux-sdk-${CHROOT_VERSION}/copyfiles\"\nNSSDATABASES=\"/etc/schroot/linux-sdk-${CHROOT_VERSION}/nssdatabases\"\n" | tee sdk-profile/config
+	rm -rf "/etc/schroot/linux-sdk-${CHROOT_VERSION}"
+	cp -r sdk-profile "/etc/schroot/linux-sdk-${CHROOT_VERSION}"
+	cp -r sdk-profile "${CHROOT_DIR}/linux-sdk-${CHROOT_VERSION}"
+
+	if test ! -d "${CHROOT_DIR}/${CHROOT_NAME}/etc"; then
+		# Create our chroot
+		echo -e "\n${COLOR_ON}Bootstrap the chroot...${COLOR_OFF}"
+		sudo -E debootstrap --arch=${pkg} --include=wget precise ${CHROOT_DIR}/${CHROOT_NAME} http://archive.ubuntu.com/ubuntu/
+	fi
 
 	# Copy over proxy settings from host machine
 	echo -e "\n${COLOR_ON}Adding proxy info to chroot (if set)...${COLOR_OFF}" 
@@ -244,8 +244,10 @@ heredoc
     # a new dbus-daemon outside the chroot which locks files 
     # inside the chroot, preventing those directories from
     # getting unmounted when the chroot exits.
-    dpkg-divert --local --rename --add /sbin/initctl
-    ln -s /bin/true /sbin/initctl
+    if test ! -e /sbin/initctl.distrib; then
+        dpkg-divert --local --rename --add /sbin/initctl
+        ln -s /bin/true /sbin/initctl
+    fi
 
 	# All repos and keys added; update
 	apt-get -y update
@@ -254,12 +256,61 @@ heredoc
 	#  Install compilers and libraries
 	#
 	apt-get install --force-yes -y ubuntu-minimal pkg-config time
-	apt-get install --force-yes -y build-essential cmake gdb
+	apt-get install --force-yes -y build-essential
+	# apt-get install --force-yes -y cmake gdb
 
 	apt-get install --force-yes -y steamrt-dev
-	apt-get install --force-yes -y gcc-4.8 g++-4.8
-	apt-get install --force-yes -y clang-3.4 lldb-3.4
-	apt-get install --force-yes -y clang-3.6 lldb-3.6
+	apt-get install --force-yes -y g++-4.8-multilib
+	# apt-get install --force-yes -y clang-3.4 lldb-3.4
+	# apt-get install --force-yes -y clang-3.6 lldb-3.6
+
+	# Extra stuff for building Unity
+	# m4 is a hidden dependency of bison (shader compiler)
+	# libgles2-mesa-dev for sdl
+	# libpq-dev for asset server
+	# nasm for fmod
+	# git libgtkglext1-dev libgnome-keyring-dev gperf bison zip for cef
+	# autoconf libtool for mono
+	apt-get install --force-yes -y m4 libgles2-mesa-dev libpq-dev nasm git libgtkglext1-dev libgnome-keyring-dev gperf bison zip autoconf libtool
+
+	# explicit x86 stuff
+	# build-essential needs to be on the install line here, or apt thinks it needs to remove it because of zlib1g-dev:i386
+	apt-get install --force-yes -y libxrender1:i386 libxrandr2:i386 libxcursor1:i386 libgtk2.0-0:i386 libgl1-mesa-glx:i386 libglu1-mesa:i386 zlib1g-dev:i386 build-essential
+
+	# symlinks for incorrectly multiarched packages
+        ln -sf libgtk-x11-2.0.so.0 /usr/lib/i386-linux-gnu/libgtk-x11-2.0.so
+        ln -sf libgdk-x11-2.0.so.0 /usr/lib/i386-linux-gnu/libgdk-x11-2.0.so
+        ln -sf libatk-1.0.so.0 /usr/lib/i386-linux-gnu/libatk-1.0.so
+        ln -sf libgio-2.0.so.0 /usr/lib/i386-linux-gnu/libgio-2.0.so
+        ln -sf libpangoft2-1.0.so.0 /usr/lib/i386-linux-gnu/libpangoft2-1.0.so
+        ln -sf libpangocairo-1.0.so.0 /usr/lib/i386-linux-gnu/libpangocairo-1.0.so
+        ln -sf libgdk_pixbuf-2.0.so.0 /usr/lib/i386-linux-gnu/libgdk_pixbuf-2.0.so
+        ln -sf libcairo.so.2 /usr/lib/i386-linux-gnu/libcairo.so
+        ln -sf libpango-1.0.so.0 /usr/lib/i386-linux-gnu/libpango-1.0.so
+        ln -sf libgobject-2.0.so.0 /usr/lib/i386-linux-gnu/libgobject-2.0.so
+        ln -sf libglib-2.0.so.0 /lib/i386-linux-gnu/libglib-2.0.so
+        ln -sf libfontconfig.so.1 /usr/lib/i386-linux-gnu/libfontconfig.so
+        ln -sf libfreetype.so.6 /usr/lib/i386-linux-gnu/libfreetype.so
+
+        if test -e /usr/lib/i386-linux-gnu/libGLU.so.1; then
+                ln -sf libGLU.so.1 /usr/lib/i386-linux-gnu/libGLU.so
+        else
+                echo "libGLU.so.1 not found; unable to create symlink"
+        fi
+
+        if test -d /usr/lib/i386-linux-gnu/mesa; then
+                ln -sf mesa/libGL.so.1 /usr/lib/i386-linux-gnu/libGL.so
+        fi
+
+
+
+        # Clean up cached packages
+	# Do this before removing SDL so we don't autoremove e.g. x11 dev packages
+        apt-get autoremove --force-yes -y
+        apt-get remove --force-yes -y '.*-doc$' '.*sdl.*'
+        apt-get clean
+        rm -rf /var/lib/apt/lists
+
 
 	# Workaround bug 714890 in 32-bit clang. Gcc 4.8 changed the include paths.
 	# http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=714890
@@ -278,16 +329,19 @@ heredoc
 	update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 100
 	update-alternatives --install /usr/bin/cpp cpp-bin /usr/bin/cpp-4.8 100
 
-	update-alternatives --install /usr/bin/gcc gcc /usr/bin/clang-3.4 50
-	update-alternatives --install /usr/bin/g++ g++ /usr/bin/clang++-3.4 50
+	# update-alternatives --install /usr/bin/gcc gcc /usr/bin/clang-3.4 50
+	# update-alternatives --install /usr/bin/g++ g++ /usr/bin/clang++-3.4 50
 
-	update-alternatives --install /usr/bin/gcc gcc /usr/bin/clang-3.6 50
-	update-alternatives --install /usr/bin/g++ g++ /usr/bin/clang++-3.6 50	
+	# update-alternatives --install /usr/bin/gcc gcc /usr/bin/clang-3.6 50
+	# update-alternatives --install /usr/bin/g++ g++ /usr/bin/clang++-3.6 50	
 
 	# gcc-4.8 is the default
 	update-alternatives --set gcc /usr/bin/gcc-4.8
 	update-alternatives --set g++ /usr/bin/g++-4.8
 	update-alternatives --set cpp-bin /usr/bin/cpp-4.8
+
+	# Set up locale
+	locale-gen en
 
 	echo ""
 	echo "#####"
@@ -315,35 +369,44 @@ function cleanup()
 main()
 {
 	# Check if we have any arguments.
-	if [[ $# == 0 ]]; then
-		echo "Usage: $0 [--beta] [--output-dir <DIRNAME>] --i386 | --amd64"
-		exit 1
-	fi
+	if [[ $# != 0 ]]; then
+		# Beta repo or regular repo?
+		if [[ "$1" == "--beta" ]]; then
+			BETA_ARG="--beta"
+			CHROOT_PREFIX=${CHROOT_PREFIX}beta_
+			shift
+		fi
 
-	# Beta repo or regular repo?
-	if [[ "$1" == "--beta" ]]; then
-		BETA_ARG="--beta"
-		CHROOT_PREFIX=${CHROOT_PREFIX}beta_
-		shift
-	fi
+		if [[ "$1" == "--output-dir" ]]; then
+			CHROOT_DIR=$2
+			shift;shift
+		fi
 
-	if [[ "$1" == "--output-dir" ]]; then
-		CHROOT_DIR=$2
-		shift;shift
-	fi
+		# Configuring root?
+		if [[ "$1" == "--configure" ]]; then
+			configure_chroot
+			exit 0
+		fi
 
-	# Configuring root?
-	if [[ "$1" == "--configure" ]]; then
-		configure_chroot
-		exit 0
+		if [[ "$1" == "--build-archive" ]]; then
+			ARCHIVE_PATH=$2
+			shift;shift
+		fi
 	fi
 
 	# Building root(s)
 	prebuild_chroot $@
 	trap cleanup EXIT
-	for var in "$@"; do
-		build_chroot $var
-	done
+
+	build_chroot
+
+	if test "x${ARCHIVE_PATH}" != 'x'; then
+		echo "Creating archive at ${ARCHIVE_PATH}"
+		pushd "${CHROOT_DIR}"
+			tar caf "${ARCHIVE_PATH}" * --exclude=dev
+		popd
+	fi
+
 	trap - EXIT
 
 	echo -e "\n${COLOR_ON}Done...${COLOR_OFF}"

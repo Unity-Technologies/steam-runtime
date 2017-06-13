@@ -1,0 +1,7 @@
+# Files to copy into the chroot from the host system.
+#
+# <source and destination>
+#/etc/resolv.conf # This gets picked up by the /run mount, since it's a symlink into /run
+/etc/gshadow
+/etc/localtime
+/etc/machine-id
