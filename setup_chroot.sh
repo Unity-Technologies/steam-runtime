@@ -11,6 +11,10 @@ BETA_ARG=""
 COLOR_OFF="\033[0m"
 COLOR_ON="\033[1;93m"
 ARCHIVE_PATH=""
+UPSTREAM_DEB="deb http://repo.steampowered.com/steamrt/ scout main"
+UPSTREAM_DEBSRC="deb-src http://repo.steampowered.com/steamrt/ scout main"
+UNITY_DEB="deb https://artifactory.bf.unity3d.com/artifactory/public-ubuntu-steam-mirror/ scout main"
+UNITY_DEBSRC="deb-src https://artifactory.bf.unity3d.com/artifactory/public-ubuntu-steam-mirror/ scout main"
 
 # exit on any script line that fails
 set -o errexit
@@ -84,7 +88,7 @@ build_chroot()
 	if test ! -d "${CHROOT_DIR}/${CHROOT_NAME}/etc"; then
 		# Create our chroot
 		echo -e "\n${COLOR_ON}Bootstrap the chroot...${COLOR_OFF}"
-		sudo -E debootstrap --arch=${pkg} --include=wget precise ${CHROOT_DIR}/${CHROOT_NAME} http://archive.ubuntu.com/ubuntu/
+		sudo -E debootstrap --arch=${pkg} --include=wget,apt-transport-https precise ${CHROOT_DIR}/${CHROOT_NAME} http://archive.ubuntu.com/ubuntu/
 	fi
 
 	# Copy over proxy settings from host machine
@@ -170,8 +174,8 @@ heredoc
 ) > /etc/apt/sources.list.d/steamrt.list
 	else
 		(cat << heredoc
-deb http://repo.steampowered.com/steamrt/ scout main
-deb-src http://repo.steampowered.com/steamrt/ scout main
+${UNITY_DEB}
+${UNITY_DEBSRC}
 heredoc
 ) > /etc/apt/sources.list.d/steamrt.list
 	fi
