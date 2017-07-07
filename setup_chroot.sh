@@ -77,8 +77,8 @@ build_chroot()
 	cp /etc/schroot/chroot.d/${CHROOT_NAME}.conf ${CHROOT_DIR}
 
 	printf "FSTAB=\"/etc/schroot/linux-sdk-${CHROOT_VERSION}/fstab\"\nCOPYFILES=\"/etc/schroot/linux-sdk-${CHROOT_VERSION}/copyfiles\"\nNSSDATABASES=\"/etc/schroot/linux-sdk-${CHROOT_VERSION}/nssdatabases\"\n" | tee sdk-profile/config
-	rm -rf "/etc/schroot/linux-sdk-${CHROOT_VERSION}"
-	cp -r sdk-profile "/etc/schroot/linux-sdk-${CHROOT_VERSION}"
+	sudo rm -rf "/etc/schroot/linux-sdk-${CHROOT_VERSION}"
+	sudo cp -r sdk-profile "/etc/schroot/linux-sdk-${CHROOT_VERSION}"
 	cp -r sdk-profile "${CHROOT_DIR}/linux-sdk-${CHROOT_VERSION}"
 
 	if test ! -d "${CHROOT_DIR}/${CHROOT_NAME}/etc"; then
