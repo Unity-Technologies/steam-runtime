@@ -1,3 +1,3 @@
-FSTAB="/etc/schroot/linux-sdk-20170609/fstab"
-COPYFILES="/etc/schroot/linux-sdk-20170609/copyfiles"
-NSSDATABASES="/etc/schroot/linux-sdk-20170609/nssdatabases"
+FSTAB="/etc/schroot/linux-sdk-20170818/fstab"
+COPYFILES="/etc/schroot/linux-sdk-20170818/copyfiles"
+NSSDATABASES="/etc/schroot/linux-sdk-20170818/nssdatabases"

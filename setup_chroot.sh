@@ -5,7 +5,7 @@ SCRIPTNAME=$(basename "$SCRIPT")
 LOGFILE=/tmp/${SCRIPTNAME%.*}-$(uname -i).log
 CHROOT_PREFIX="LinuxBuildEnvironment"
 CHROOT_DIR=${HOME}/chroots
-CHROOT_VERSION="20170609"
+CHROOT_VERSION="20170818"
 CHROOT_NAME=""
 BETA_ARG=""
 COLOR_OFF="\033[0m"
@@ -108,6 +108,7 @@ build_chroot()
 	TMPNAME="${SCRIPTNAME%.*}-$$.sh"
 	cp -f "$0" "/tmp/${TMPNAME}"
 	chmod +x "/tmp/${TMPNAME}"
+	cp -R backports /tmp
 	schroot --chroot ${CHROOT_NAME} -d /tmp --user root -- "/tmp/${TMPNAME}" ${BETA_ARG} --configure
 	rm -f "/tmp/${TMPNAME}"
 }
@@ -275,7 +276,7 @@ heredoc
 	# nasm for fmod
 	# git libgtkglext1-dev libgnome-keyring-dev gperf bison zip for cef
 	# autoconf libtool for mono
-	apt-get install --force-yes -y m4 libgles2-mesa-dev libpq-dev nasm git libgtkglext1-dev libgnome-keyring-dev gperf bison zip autoconf libtool
+	apt-get install --force-yes -y m4 libgles2-mesa-dev libpq-dev nasm git libgtkglext1-dev libgnome-keyring-dev gperf bison zip autoconf libtool mercurial libsoup2.4-dev liblzo2-2
 
 	# explicit x86 stuff
 	# build-essential needs to be on the install line here, or apt thinks it needs to remove it because of zlib1g-dev:i386
@@ -305,6 +306,9 @@ heredoc
         if test -d /usr/lib/i386-linux-gnu/mesa; then
                 ln -sf mesa/libGL.so.1 /usr/lib/i386-linux-gnu/libGL.so
         fi
+
+	# backports
+	dpkg -i backports/libarchive13_3.2.2-2_amd64.deb backports/libarchive-dev_3.2.2-2_amd64.deb backports/libhogweed4_3.3-1_amd64.deb backports/libnettle6_3.3-1_amd64.deb backports/nettle-dev_3.3-1_amd64.deb
 
 
 

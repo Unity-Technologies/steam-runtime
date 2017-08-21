@@ -1,0 +1,43 @@
+Format: 1.8
+Date: Sun, 02 Oct 2016 18:44:03 +0200
+Source: nettle
+Binary: libnettle6 libhogweed4 nettle-dev nettle-bin nettle-dbg
+Architecture: amd64
+Version: 3.3-1
+Distribution: unstable
+Urgency: low
+Maintainer: Magnus Holmgren <holmgren@debian.org>
+Changed-By: Magnus Holmgren <holmgren@debian.org>
+Description: 
+ libhogweed4 - low level cryptographic library (public-key cryptos)
+ libnettle6 - low level cryptographic library (symmetric and one-way cryptos)
+ nettle-bin - low level cryptographic library (binary tools)
+ nettle-dbg - low level cryptographic library (debugging symbols)
+ nettle-dev - low level cryptographic library (development files)
+Closes: 808648 832983
+Changes: 
+ nettle (3.3-1) unstable; urgency=low
+ .
+   * New upstream release.
+     * Includes fix for CVE-2016-6489 - "RSA code is vulnerable to cache
+       sharing related attacks" (Closes: #832983).
+   * Include --raw option in nettle-hash(1) manpage (Closes: #808648).
+   * Bump Standards-Version to 3.9.8.
+Checksums-Sha1: 
+ e75683e6d9156fab8a8c29761fed8e7f5cd5fb35 208206 libnettle6_3.3-1_amd64.deb
+ 95d03e8b6a4d50df14dbd71b4f29b9c51c806e73 143416 libhogweed4_3.3-1_amd64.deb
+ 361276bcef9c91fee97f0a1b7eeae0c47e5135d6 1120518 nettle-dev_3.3-1_amd64.deb
+ a9e5a2963c2c3b72249d1bcca6f769833da51238 28194 nettle-bin_3.3-1_amd64.deb
+ 2a6f0c67e9bd2b31d49ce37413d5cc1dde4f6784 490224 nettle-dbg_3.3-1_amd64.deb
+Checksums-Sha256: 
+ d65cb96ca24bc16d442c52301b8722a046b5b4a42212dd57da47e561b09cb481 208206 libnettle6_3.3-1_amd64.deb
+ 64d3cdceba91f6fa03fac9ac9e8a53e601bd51a50a48d2a48d06fe845f1a4dc7 143416 libhogweed4_3.3-1_amd64.deb
+ acc0ee998b22485d69a3bba817f45262381783fde2861e6567da488a0d09f6c8 1120518 nettle-dev_3.3-1_amd64.deb
+ 1465045dee6744e0ad59919b870c534ddf33c9120da8036f04c699eb7f47daec 28194 nettle-bin_3.3-1_amd64.deb
+ 1afb32ed9c84a115c75aabf12c6a1b82995b6f65b3bca4d369fb08e937e1200e 490224 nettle-dbg_3.3-1_amd64.deb
+Files: 
+ 26f723893a313060a2eec9bd06e0f76c 208206 libs optional libnettle6_3.3-1_amd64.deb
+ b401ed1999ded643f6d56c1be114c037 143416 libs optional libhogweed4_3.3-1_amd64.deb
+ a1102cfd998908536bc22694d320c911 1120518 libdevel optional nettle-dev_3.3-1_amd64.deb
+ 0e5bcf918c90cec83faac2fc75502f03 28194 misc optional nettle-bin_3.3-1_amd64.deb
+ f9acfadd8eb833ea9972b07374ba12eb 490224 debug extra nettle-dbg_3.3-1_amd64.deb

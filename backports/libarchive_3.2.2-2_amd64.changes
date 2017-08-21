@@ -1,0 +1,39 @@
+Format: 1.8
+Date: Mon, 03 Apr 2017 22:20:05 +0200
+Source: libarchive
+Binary: libarchive-dev libarchive13 libarchive-tools bsdtar bsdcpio
+Architecture: amd64 all
+Version: 3.2.2-2
+Distribution: unstable
+Urgency: medium
+Maintainer: Debian Libarchive Maintainers <ah-libarchive@debian.org>
+Changed-By: Andreas Henriksson <andreas@fatal.se>
+Description: 
+ bsdcpio    - transitional dummy package for moving bsdcpio to libarchive-tools
+ bsdtar     - transitional dummy package for moving bsdtar to libarchive-tools
+ libarchive-dev - Multi-format archive and compression library (development files)
+ libarchive-tools - FreeBSD implementations of 'tar' and 'cpio' and other archive too
+ libarchive13 - Multi-format archive and compression library (shared library)
+Closes: 859455
+Changes: 
+ libarchive (3.2.2-2) unstable; urgency=medium
+ .
+   * Disable tests (Closes: #859455)
+Checksums-Sha1: 
+ 7daeec434634490936554f3e9ca7ec5292cfed5b 597904 libarchive-dev_3.2.2-2_amd64.deb
+ 1b7ae2f4e099cf2052404290e4858055733c09d0 347616 libarchive13_3.2.2-2_amd64.deb
+ e6cc72b3dba7acaae8121cb24d37b820d97b0da6 86982 libarchive-tools_3.2.2-2_amd64.deb
+ 3e534e043c9b6dbc289c1469679c18206ddd0e39 12184 bsdtar_3.2.2-2_all.deb
+ 565b179e28be33e387e3818816ca5a9711fb8078 12182 bsdcpio_3.2.2-2_all.deb
+Checksums-Sha256: 
+ da04534451ea93f4c01b2653d8a2c1ef7d49a84062b25dd4f81df9c35870f032 597904 libarchive-dev_3.2.2-2_amd64.deb
+ 47cab480c538707f3afdc1d136c3d67a50ba87572423a15acc7cd97da63226db 347616 libarchive13_3.2.2-2_amd64.deb
+ b76384bf3a65e362420af024617f8e108d0afff6c07562727faed1776bf30873 86982 libarchive-tools_3.2.2-2_amd64.deb
+ ff14b9bf9a4d6e7053973288cb29e5f6679fe0eb4dd96909ee9688c6e62e3f60 12184 bsdtar_3.2.2-2_all.deb
+ 1bc2c2414b4ec339a2ceb419f894dc37c13e63edf26d2091d1c4594469b6268a 12182 bsdcpio_3.2.2-2_all.deb
+Files: 
+ a5d5a3d2cc8dfa6bf80424aa91d0da0a 597904 libdevel optional libarchive-dev_3.2.2-2_amd64.deb
+ e443ff553b171b21bb12f5103834a4f5 347616 libs optional libarchive13_3.2.2-2_amd64.deb
+ aa1f19580658ce63a98fc45da12b8edf 86982 utils optional libarchive-tools_3.2.2-2_amd64.deb
+ 52a1334354d39622bb02a5bd6937e241 12184 oldlibs extra bsdtar_3.2.2-2_all.deb
+ 0ff75a0ebe45ba30cff3e4f78a9dfc54 12182 oldlibs extra bsdcpio_3.2.2-2_all.deb
