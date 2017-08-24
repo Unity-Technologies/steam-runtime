@@ -19,7 +19,7 @@
 # to run additional services in the chroot.  However, note that this
 # may potentially cause undesirable behaviour on upgrades, such as
 # killing services on the host.
-/run           /run            none    rw,bind         0       0
+/run           /run            none    rw,rbind         0       0
 #/run/user      /run/user       none    rw,bind         0       0
 #/run/lock      /run/lock       none    rw,bind         0       0
 /dev/shm       /dev/shm        none    rw,bind         0       0
