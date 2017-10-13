@@ -84,6 +84,7 @@ build_chroot()
 	sudo rm -rf "/etc/schroot/linux-sdk-${CHROOT_VERSION}"
 	sudo cp -r sdk-profile "/etc/schroot/linux-sdk-${CHROOT_VERSION}"
 	cp -r sdk-profile "${CHROOT_DIR}/linux-sdk-${CHROOT_VERSION}"
+	cp -r schroot-10mount "${CHROOT_DIR}/10mount"
 
 	if test ! -d "${CHROOT_DIR}/${CHROOT_NAME}/etc"; then
 		# Create our chroot
