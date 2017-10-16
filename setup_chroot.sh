@@ -83,6 +83,14 @@ build_chroot()
 	printf "FSTAB=\"/etc/schroot/linux-sdk-${CHROOT_VERSION}/fstab\"\nCOPYFILES=\"/etc/schroot/linux-sdk-${CHROOT_VERSION}/copyfiles\"\nNSSDATABASES=\"/etc/schroot/linux-sdk-${CHROOT_VERSION}/nssdatabases\"\n" | tee sdk-profile/config
 	sudo rm -rf "/etc/schroot/linux-sdk-${CHROOT_VERSION}"
 	sudo cp -r sdk-profile "/etc/schroot/linux-sdk-${CHROOT_VERSION}"
+
+	# RBind mount on /run when /run/shm is already a bind mount is bad
+	if test -L /run/shm; then
+		sudo cp "/etc/schroot/linux-sdk-${CHROOT_VERSION}/fstab-1604" "/etc/schroot/linux-sdk-${CHROOT_VERSION}/fstab"
+	else
+		sudo cp "/etc/schroot/linux-sdk-${CHROOT_VERSION}/fstab-1204" "/etc/schroot/linux-sdk-${CHROOT_VERSION}/fstab"
+	fi
+
 	cp -r sdk-profile "${CHROOT_DIR}/linux-sdk-${CHROOT_VERSION}"
 	cp -r schroot-10mount "${CHROOT_DIR}/10mount"
 
