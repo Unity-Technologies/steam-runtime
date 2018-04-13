@@ -5,7 +5,7 @@ SCRIPTNAME=$(basename "$SCRIPT")
 LOGFILE=/tmp/${SCRIPTNAME%.*}-$(uname -i).log
 CHROOT_PREFIX="LinuxBuildEnvironment"
 CHROOT_DIR=${HOME}/chroots
-CHROOT_VERSION="20170818"
+CHROOT_VERSION="20180406"
 CHROOT_NAME=""
 BETA_ARG=""
 COLOR_OFF="\033[0m"
@@ -285,7 +285,8 @@ heredoc
 	# nasm for fmod
 	# git libgtkglext1-dev libgnome-keyring-dev gperf bison zip for cef
 	# autoconf libtool for mono
-	apt-get install --force-yes -y m4 libgles2-mesa-dev libpq-dev nasm git libgtkglext1-dev libgnome-keyring-dev gperf bison zip autoconf libtool mercurial libsoup2.4-dev liblzo2-2
+	# gtk3 for editor
+	apt-get install --force-yes -y m4 libgles2-mesa-dev libpq-dev nasm git libgtkglext1-dev libgnome-keyring-dev gperf bison zip autoconf libtool mercurial libsoup2.4-dev liblzo2-2 libgtk-3-dev
 
 	# explicit x86 stuff
 	# build-essential needs to be on the install line here, or apt thinks it needs to remove it because of zlib1g-dev:i386
