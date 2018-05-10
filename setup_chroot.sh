@@ -94,6 +94,9 @@ build_chroot()
 	cp -r sdk-profile "${CHROOT_DIR}/linux-sdk-${CHROOT_VERSION}"
 	cp -r schroot-10mount "${CHROOT_DIR}/10mount"
 
+	# Add the Ubuntu GPG key to apt
+	sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 0x40976EAF437D05B5
+
 	if test ! -d "${CHROOT_DIR}/${CHROOT_NAME}/etc"; then
 		# Create our chroot
 		echo -e "\n${COLOR_ON}Bootstrap the chroot...${COLOR_OFF}"
