@@ -5,7 +5,7 @@ SCRIPTNAME=$(basename "$SCRIPT")
 LOGFILE=/tmp/${SCRIPTNAME%.*}-$(uname -i).log
 CHROOT_PREFIX="LinuxBuildEnvironment"
 CHROOT_DIR=${HOME}/chroots
-CHROOT_VERSION="20180907"
+CHROOT_VERSION="20180928"
 CHROOT_NAME=""
 BETA_ARG=""
 COLOR_OFF="\033[0m"
@@ -322,6 +322,7 @@ heredoc
 
 	# backports
 	dpkg -i backports/libarchive13_3.2.2-2_amd64.deb backports/libarchive-dev_3.2.2-2_amd64.deb backports/libhogweed4_3.3-1_amd64.deb backports/libnettle6_3.3-1_amd64.deb backports/nettle-dev_3.3-1_amd64.deb backports/ocl-icd-libopencl1_2.1.3-4_amd64.deb backports/ocl-icd-opencl-dev_2.1.3-4_amd64.deb backports/opencl-headers_1.2-2013.10.23-1_all.deb
+	tar xaf backports/cmake-3.12.2-Linux-x86_64.tar.gz --directory /usr --strip-components=1
 
 
 
